@@ -1,10 +1,13 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage as memStorage } from "./storage";
+import { IStorage } from "./storage";
 import { insertProjectSchema, insertServiceSchema, insertResourceUsageSchema, insertActivitySchema } from "@shared/schema";
 import { ZodError } from "zod";
 
-export async function registerRoutes(app: Express): Promise<Server> {
+export async function registerRoutes(app: Express, customStorage?: IStorage): Promise<Server> {
+  // Use the provided storage implementation or fall back to in-memory storage
+  const storage = customStorage || memStorage;
   // Error handler for Zod validation errors
   const handleZodError = (error: unknown) => {
     if (error instanceof ZodError) {
@@ -286,10 +289,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const usages = await storage.getResourceUsage(service.id);
           if (usages.length > 0) {
             const latestUsage = usages[usages.length - 1];
-            cpuUsageTotal += latestUsage.cpuUsage;
-            memoryUsageTotal += latestUsage.memoryUsage;
-            storageUsageTotal += latestUsage.storageUsage;
-            networkUsageTotal += latestUsage.networkUsage;
+            if (latestUsage.cpuUsage !== null) cpuUsageTotal += latestUsage.cpuUsage;
+            if (latestUsage.memoryUsage !== null) memoryUsageTotal += latestUsage.memoryUsage;
+            if (latestUsage.storageUsage !== null) storageUsageTotal += latestUsage.storageUsage;
+            if (latestUsage.networkUsage !== null) networkUsageTotal += latestUsage.networkUsage;
             usageCount++;
           }
         }

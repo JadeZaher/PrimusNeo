@@ -1,6 +1,8 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { initDatabase } from "./database";
+import { SQLiteStorage } from "./sqlite-storage";
 
 const app = express();
 app.use(express.json());
@@ -37,7 +39,18 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  const server = await registerRoutes(app);
+  // Initialize database
+  const dbInitialized = initDatabase();
+  
+  // Create SQLite storage instance and seed the database
+  const sqliteStorage = new SQLiteStorage();
+  if (dbInitialized) {
+    // Seed the database with initial data
+    await sqliteStorage.seedDatabase();
+    log('Database initialized and seeded successfully', 'database');
+  }
+  
+  const server = await registerRoutes(app, sqliteStorage);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
