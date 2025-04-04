@@ -32,11 +32,12 @@ export function initDatabase() {
     
     log(`Creating tables if they don't exist: ${tables.join(', ')}`, 'database');
     
-    // Execute migrations
-    db.run(/* sql */ `
-      PRAGMA journal_mode = WAL;
-      PRAGMA synchronous = NORMAL;
-      
+    // Execute migrations - run each statement separately
+    sqlite.pragma('journal_mode = WAL');
+    sqlite.pragma('synchronous = NORMAL');
+    
+    // Create tables individually
+    sqlite.exec(`
       -- Users table
       CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,7 +47,9 @@ export function initDatabase() {
         avatar TEXT,
         role TEXT NOT NULL DEFAULT 'user'
       );
-      
+    `);
+    
+    sqlite.exec(`
       -- Projects table
       CREATE TABLE IF NOT EXISTS projects (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -57,7 +60,9 @@ export function initDatabase() {
         cost_per_month REAL DEFAULT 0,
         user_id INTEGER NOT NULL
       );
-      
+    `);
+    
+    sqlite.exec(`
       -- Services table
       CREATE TABLE IF NOT EXISTS services (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -68,7 +73,9 @@ export function initDatabase() {
         config TEXT NOT NULL DEFAULT '{}',
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
-      
+    `);
+    
+    sqlite.exec(`
       -- Resource usage table
       CREATE TABLE IF NOT EXISTS resource_usage (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -79,7 +86,9 @@ export function initDatabase() {
         network_usage REAL DEFAULT 0,
         timestamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
-      
+    `);
+    
+    sqlite.exec(`
       -- Activities table
       CREATE TABLE IF NOT EXISTS activities (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -90,7 +99,9 @@ export function initDatabase() {
         service_id INTEGER,
         timestamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
-      
+    `);
+    
+    sqlite.exec(`
       -- Service health table
       CREATE TABLE IF NOT EXISTS service_health (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
