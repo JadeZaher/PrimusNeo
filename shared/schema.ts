@@ -1,122 +1,130 @@
-import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, json, real } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// User model
+// User schema
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
-  email: text("email").notNull(),
-  displayName: text("display_name").notNull(),
-  avatarUrl: text("avatar_url"),
+  fullName: text("full_name").notNull(),
+  avatar: text("avatar"),
+  role: text("role").default("user").notNull(),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
-  email: true,
-  displayName: true,
-  avatarUrl: true,
+  fullName: true,
+  avatar: true,
+  role: true,
 });
 
-// Projects model
+// Project schema
 export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  description: text("description"),
-  ownerId: integer("owner_id").notNull(),
+  status: text("status").notNull().default("development"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  lastDeployed: timestamp("last_deployed"),
+  costPerMonth: real("cost_per_month").default(0),
+  userId: integer("user_id").notNull(),
 });
 
 export const insertProjectSchema = createInsertSchema(projects).pick({
   name: true,
-  description: true,
-  ownerId: true,
+  status: true,
+  costPerMonth: true,
+  userId: true,
 });
 
-// Service types
-export const serviceTypes = pgTable("service_types", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull().unique(),
-  description: text("description"),
-  icon: text("icon").notNull(),
-  color: text("color").notNull(),
-});
-
-export const insertServiceTypeSchema = createInsertSchema(serviceTypes).pick({
-  name: true,
-  description: true,
-  icon: true,
-  color: true,
-});
-
-// Services model
+// Service schema
 export const services = pgTable("services", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  description: text("description"),
+  type: text("type").notNull(),
+  status: text("status").notNull().default("active"),
   projectId: integer("project_id").notNull(),
-  typeId: integer("type_id").notNull(),
-  status: text("status").notNull(), // active, stopped, error
-  cpu: integer("cpu"), // percentage
-  memory: integer("memory"), // percentage
-  storage: integer("storage"), // percentage
-  bandwidth: integer("bandwidth"), // MB/s
-  connections: integer("connections"),
-  createdAt: timestamp("created_at").defaultNow(),
+  config: json("config").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const insertServiceSchema = createInsertSchema(services).pick({
   name: true,
-  description: true,
-  projectId: true,
-  typeId: true,
+  type: true,
   status: true,
-  cpu: true,
-  memory: true,
-  storage: true,
-  bandwidth: true,
-  connections: true,
+  projectId: true,
+  config: true,
 });
 
-// Activities model
+// Resource usage schema
+export const resourceUsage = pgTable("resource_usage", {
+  id: serial("id").primaryKey(),
+  serviceId: integer("service_id").notNull(),
+  cpuUsage: real("cpu_usage").default(0),
+  memoryUsage: real("memory_usage").default(0),
+  storageUsage: real("storage_usage").default(0),
+  networkUsage: real("network_usage").default(0),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+});
+
+export const insertResourceUsageSchema = createInsertSchema(resourceUsage).pick({
+  serviceId: true,
+  cpuUsage: true,
+  memoryUsage: true,
+  storageUsage: true,
+  networkUsage: true,
+});
+
+// Activity log schema
 export const activities = pgTable("activities", {
   id: serial("id").primaryKey(),
-  type: text("type").notNull(), // deployment, alert, config, team, incident
-  title: text("title").notNull(),
-  description: text("description"),
-  severity: text("severity").notNull(), // success, warning, error, info
+  type: text("type").notNull(),
+  message: text("message").notNull(),
+  userId: integer("user_id"),
+  projectId: integer("project_id"),
   serviceId: integer("service_id"),
-  projectId: integer("project_id").notNull(),
-  timestamp: timestamp("timestamp").defaultNow(),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
 });
 
 export const insertActivitySchema = createInsertSchema(activities).pick({
   type: true,
-  title: true,
-  description: true,
-  severity: true,
-  serviceId: true,
+  message: true,
+  userId: true,
   projectId: true,
+  serviceId: true,
 });
 
-// Export types
+// Service health schema
+export const serviceHealth = pgTable("service_health", {
+  id: serial("id").primaryKey(),
+  serviceType: text("service_type").notNull().unique(),
+  status: text("status").notNull().default("operational"),
+  uptime: real("uptime").default(100),
+  lastUpdated: timestamp("last_updated").defaultNow().notNull(),
+});
+
+export const insertServiceHealthSchema = createInsertSchema(serviceHealth).pick({
+  serviceType: true,
+  status: true,
+  uptime: true,
+});
+
+// Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 
 export type Project = typeof projects.$inferSelect;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
 
-export type ServiceType = typeof serviceTypes.$inferSelect;
-export type InsertServiceType = z.infer<typeof insertServiceTypeSchema>;
-
 export type Service = typeof services.$inferSelect;
 export type InsertService = z.infer<typeof insertServiceSchema>;
+
+export type ResourceUsage = typeof resourceUsage.$inferSelect;
+export type InsertResourceUsage = z.infer<typeof insertResourceUsageSchema>;
 
 export type Activity = typeof activities.$inferSelect;
 export type InsertActivity = z.infer<typeof insertActivitySchema>;
 
-// Custom validation schemas
-export const serviceStatusSchema = z.enum(['active', 'stopped', 'error']);
-export const activityTypeSchema = z.enum(['deployment', 'alert', 'config', 'team', 'incident']);
-export const severitySchema = z.enum(['success', 'warning', 'error', 'info']);
+export type ServiceHealthStatus = typeof serviceHealth.$inferSelect;
+export type InsertServiceHealthStatus = z.infer<typeof insertServiceHealthSchema>;

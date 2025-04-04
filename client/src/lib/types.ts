@@ -1,80 +1,84 @@
-// Types for the frontend components that extend the DB schema types
-
-// Import from schema
-import {
-  User,
-  Project,
-  Service,
-  ServiceType,
-  Activity
-} from "@shared/schema";
-
-// Enhanced types with additional UI related properties
-export interface ServiceWithType extends Service {
-  type: ServiceType;
-}
-
-export interface ActivityWithService extends Activity {
-  service?: {
-    id: number;
-    name: string;
-  };
-}
-
-// UI types
-export interface MetricProps {
-  title: string;
-  value: string | number;
-  icon: string;
-  iconColor: string;
-  iconBgColor: string;
-  change?: {
-    value: string;
-    type: 'increase' | 'decrease' | 'neutral';
-  };
-  progressValue?: number;
-}
-
-export interface ServiceCardProps {
-  service: ServiceWithType;
-  onConfigure: (serviceId: number) => void;
-  onAction: (serviceId: number) => void;
-}
-
-export type ServiceStatus = 'active' | 'stopped' | 'error';
-
-export type ActivityType = 'deployment' | 'alert' | 'config' | 'team' | 'incident';
-
-export type Severity = 'success' | 'warning' | 'error' | 'info';
-
-export interface StatusBadgeProps {
-  status: ServiceStatus;
-}
-
-export interface ProjectSelectorProps {
-  projects: Project[];
-  selectedProject: Project | null;
-  onProjectChange: (project: Project) => void;
-}
-
-export interface ServiceMetric {
+// Project types
+export interface Project {
+  id: number;
   name: string;
-  value: string;
-  percentage: number;
+  status: "development" | "production" | "staging";
+  createdAt: string;
+  lastDeployed: string | null;
+  costPerMonth: number;
+  userId: number;
 }
 
-export interface ServiceHealthEntry {
+// Service types
+export interface Service {
+  id: number;
   name: string;
+  type: "compute" | "database" | "storage" | "function" | "network";
+  status: "active" | "inactive" | "error";
+  projectId: number;
+  config: Record<string, any>;
+  createdAt: string;
+}
+
+// Resource usage type
+export interface ResourceUsage {
+  id: number;
+  serviceId: number;
+  cpuUsage: number;
+  memoryUsage: number;
+  storageUsage: number;
+  networkUsage: number;
+  timestamp: string;
+}
+
+// Activity type
+export interface Activity {
+  id: number;
+  type: "alert" | "deployment" | "database" | "billing" | "project_created" | "service_created";
+  message: string;
+  userId: number | null;
+  projectId: number | null;
+  serviceId: number | null;
+  timestamp: string;
+}
+
+// Service health type
+export interface ServiceHealth {
+  id: number;
+  serviceType: string;
+  status: "operational" | "degraded" | "outage";
   uptime: number;
-  status: 'success' | 'warning' | 'error';
+  lastUpdated: string;
 }
 
-export interface DashboardStats {
-  totalServices: number;
-  serviceChange: number;
-  resourceUsage: number;
-  activeDeployments: number;
-  healthStatus: string;
-  costEstimate: string;
-  costChange: number;
+// Dashboard overview type
+export interface DashboardOverview {
+  resources: {
+    compute: number;
+    databases: number;
+    storage: number;
+    deployments: {
+      total: number;
+      healthy: number;
+    };
+  };
+  usage: {
+    cpu: number;
+    memory: number;
+    storage: number;
+    network: number;
+    database: number;
+  };
+  serviceHealth: ServiceHealth[];
+  recentActivities: Activity[];
+  projects: Project[];
+}
+
+// User type
+export interface User {
+  id: number;
+  username: string;
+  fullName: string;
+  avatar?: string;
+  role: string;
 }
