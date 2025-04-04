@@ -299,7 +299,10 @@ export class MemStorage implements IStorage {
       "Storage Services", 
       "Networking", 
       "Authentication", 
-      "CI/CD Pipeline"
+      "CI/CD Pipeline",
+      "Web3 Identity Services (Oasis)",
+      "Spatial Services",
+      "3D Services (AMP)"
     ];
     
     serviceTypes.forEach(type => {
@@ -380,6 +383,27 @@ export class MemStorage implements IStorage {
         status: "active",
         projectId: 3,
         config: { size: "large", version: "latest" }
+      },
+      {
+        name: "Oasis Identity Provider",
+        type: "web3",
+        status: "active",
+        projectId: 1,
+        config: { version: "1.0", blockchain: "ethereum", features: ["sign-in", "key-management"] }
+      },
+      {
+        name: "Spatial Mapping Service",
+        type: "spatial",
+        status: "active",
+        projectId: 2,
+        config: { region: "global", features: ["geo-mapping", "coordinate-indexing"] }
+      },
+      {
+        name: "AMP 3D Rendering Engine",
+        type: "3d_amp",
+        status: "active",
+        projectId: 3,
+        config: { gpu: "high-performance", features: ["real-time", "physics-engine"] }
       }
     ];
     
@@ -388,7 +412,7 @@ export class MemStorage implements IStorage {
     });
 
     // Create sample resource usages
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= 9; i++) {
       this.createResourceUsage({
         serviceId: i,
         cpuUsage: Math.random() * 100,
@@ -427,6 +451,27 @@ export class MemStorage implements IStorage {
         userId: 1,
         projectId: null,
         serviceId: null
+      },
+      {
+        type: "service_created",
+        message: "Web3 Identity Service (Oasis) created successfully",
+        userId: 1,
+        projectId: 1,
+        serviceId: 7
+      },
+      {
+        type: "service_created",
+        message: "Spatial Mapping Service deployed successfully",
+        userId: 1,
+        projectId: 2,
+        serviceId: 8
+      },
+      {
+        type: "service_created",
+        message: "AMP 3D Rendering Engine provisioned successfully",
+        userId: 1,
+        projectId: 3,
+        serviceId: 9
       }
     ];
     

@@ -13,7 +13,7 @@ export interface Project {
 export interface Service {
   id: number;
   name: string;
-  type: "compute" | "database" | "storage" | "function" | "network";
+  type: "compute" | "database" | "storage" | "function" | "network" | "web3" | "spatial" | "3d_amp";
   status: "active" | "inactive" | "error";
   projectId: number;
   config: Record<string, any>;
@@ -57,6 +57,9 @@ export interface DashboardOverview {
     compute: number;
     databases: number;
     storage: number;
+    web3: number;
+    spatial: number;
+    amp3d: number;
     deployments: {
       total: number;
       healthy: number;

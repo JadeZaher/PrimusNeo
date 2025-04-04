@@ -42,7 +42,7 @@ export const insertProjectSchema = createInsertSchema(projects).pick({
 export const services = pgTable("services", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  type: text("type").notNull(),
+  type: text("type").notNull(), // Updated to include "web3", "spatial", "3d_amp"
   status: text("status").notNull().default("active"),
   projectId: integer("project_id").notNull(),
   config: json("config").notNull(),

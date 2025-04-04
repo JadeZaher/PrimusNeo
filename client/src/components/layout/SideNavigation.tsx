@@ -10,7 +10,10 @@ import {
   ShieldCheck, 
   Settings, 
   HelpCircle,
-  CloudIcon
+  CloudIcon,
+  KeyRound,
+  Map,
+  Box
 } from "lucide-react";
 import { User } from "@/lib/types";
 
@@ -31,7 +34,10 @@ export default function SideNavigation({ user }: SideNavigationProps) {
     { name: "Functions", icon: <Parentheses className="mr-3 h-5 w-5" />, path: "/services/functions" },
     { name: "Networking", icon: <Globe className="mr-3 h-5 w-5" />, path: "/services/networking" },
     { name: "CI/CD", icon: <Terminal className="mr-3 h-5 w-5" />, path: "/services/cicd" },
-    { name: "Security", icon: <ShieldCheck className="mr-3 h-5 w-5" />, path: "/services/security" }
+    { name: "Security", icon: <ShieldCheck className="mr-3 h-5 w-5" />, path: "/services/security" },
+    { name: "Web3 Identity (Oasis)", icon: <KeyRound className="mr-3 h-5 w-5" />, path: "/services/web3" },
+    { name: "Spatial Services", icon: <Map className="mr-3 h-5 w-5" />, path: "/services/spatial" },
+    { name: "3D Services (AMP)", icon: <Box className="mr-3 h-5 w-5" />, path: "/services/3d_amp" }
   ];
   
   const secondaryItems = [

@@ -253,6 +253,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let totalCompute = 0;
       let totalDatabases = 0;
       let totalStorage = 0;
+      let totalWeb3 = 0;
+      let totalSpatial = 0;
+      let totalAmp3d = 0;
       
       for (const project of projects) {
         const services = await storage.getServices(project.id);
@@ -260,6 +263,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (service.type === 'compute') totalCompute++;
           if (service.type === 'database') totalDatabases++;
           if (service.type === 'storage') totalStorage++;
+          if (service.type === 'web3') totalWeb3++;
+          if (service.type === 'spatial') totalSpatial++;
+          if (service.type === '3d_amp') totalAmp3d++;
         }
       }
       
@@ -294,6 +300,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           compute: totalCompute,
           databases: totalDatabases,
           storage: totalStorage,
+          web3: totalWeb3,
+          spatial: totalSpatial,
+          amp3d: totalAmp3d,
           deployments: {
             total: projects.length,
             healthy: projects.length
