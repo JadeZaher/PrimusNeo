@@ -1,0 +1,19 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "driver": "PostgreSQL",
+            "connectString": "postgresql://postgres:mHjYscwKZPRJhmWOFcFHvpfJzRJEpHtF@postgres.railway.internal:5432/railway",
+            "name": "primusneo/main/postgress",
+            "group": "primusneo"
+        },
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "driver": "PostgreSQL",
+            "connectString": "postgresql://postgres:mHjYscwKZPRJhmWOFcFHvpfJzRJEpHtF@tramway.proxy.rlwy.net:19875/railway",
+            "name": "primusneo-postgress"
+        }
+    ]
+}

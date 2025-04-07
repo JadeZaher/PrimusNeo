@@ -2,7 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initDatabase } from "./database";
-import { SQLiteStorage } from "./sqlite-storage";
+import { PostgresStorage } from "./postgres-storage";
 
 const app = express();
 app.use(express.json());
@@ -42,15 +42,15 @@ app.use((req, res, next) => {
   // Initialize database
   const dbInitialized = initDatabase();
   
-  // Create SQLite storage instance and seed the database
-  const sqliteStorage = new SQLiteStorage();
-  if (dbInitialized) {
+  // Create PostgreSQL storage instance and seed the database
+  const postgresStorage = new PostgresStorage();
+  if (await dbInitialized) {
     // Seed the database with initial data
-    await sqliteStorage.seedDatabase();
+    await postgresStorage.seedDatabase();
     log('Database initialized and seeded successfully', 'database');
   }
   
-  const server = await registerRoutes(app, sqliteStorage);
+  const server = await registerRoutes(app, postgresStorage);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
@@ -69,10 +69,8 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
+  // Use the port from the environment variables or default to 3000
+  const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
   server.listen({
     port,
     host: "0.0.0.0",
